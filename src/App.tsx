@@ -75,7 +75,10 @@ const App: React.FC = () => {
   ]);
 
   const handleLogin = () => setIsLoggedIn(true);
-
+  const handleLogout = () => {
+    setIsLoggedIn(false); // Define como não logado e redireciona para o login
+    setSelectedScreen('login');
+  };
   if (!isLoggedIn) return <Login onLogin={handleLogin} />;
 
   const handleViewPatient = (patientId: number) => {
@@ -130,7 +133,7 @@ const App: React.FC = () => {
 
   return (
     <div className="flex">
-      <Sidebar onSelectScreen={setSelectedScreen} />
+      <Sidebar onSelectScreen={setSelectedScreen} onLogout={handleLogout}/>
       <div className="ml-64 flex-grow p-8 bg-gray-100 min-h-screen">{renderContent()}</div>
     </div>
   );
