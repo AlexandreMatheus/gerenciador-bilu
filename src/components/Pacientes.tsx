@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getPatients, searchPatients } from '../services/PatientService';
+import { getPatientById, getPatients, searchPatients } from '../services/PatientService';
 
 type PacientesProps = {
   onViewPatient: (patientId: number) => void;
@@ -18,13 +18,41 @@ interface Patient {
 
 const ITEMS_PER_PAGE = 18;
 
+interface AutocompleteOption {
+  id: number; // Identificador único do paciente
+  name: string; // Nome do paciente
+}
+
 const Pacientes: React.FC<PacientesProps> = ({ onViewPatient, onHandleNewPaciente }) => {
   const [patients, setPatients] = useState<Patient[]>([]);
   const [totalPatients, setTotalPatients] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
-  const [autocompleteOptions, setAutocompleteOptions] = useState<string[]>([]);
+  const [autocompleteOptions, setAutocompleteOptions] = useState<AutocompleteOption[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(false);
+
+  const handleSearch = async (term: string) => {
+    setSearchTerm(term);
+
+    if (term.length > 2) {
+      try {
+        const options = await searchPatients(term); // Busca nomes e IDs correspondentes
+        setAutocompleteOptions(options);
+      } catch (error) {
+        //@ts-ignore
+        console.error('Erro ao buscar autocomplete:', error.message);
+      }
+    } else {
+      setAutocompleteOptions([]);
+    }
+
+    // Pesquisa completa apenas se o termo mudar
+    if (term.length === 0) {
+      // Reseta a lista de pacientes quando o termo de busca é apagado
+      const { data } = await getPatients(currentPage, ITEMS_PER_PAGE);
+      setPatients(data);
+    }
+  };
 
   useEffect(() => {
     const fetchPatients = async () => {
@@ -44,31 +72,27 @@ const Pacientes: React.FC<PacientesProps> = ({ onViewPatient, onHandleNewPacient
     fetchPatients();
   }, [currentPage]);
 
-  const handleSearch = async (term: string) => {
-    setSearchTerm(term);
-
-    if (term.length > 2) {
-      try {
-        const options = await searchPatients(term);
-        setAutocompleteOptions(options);
-      } catch (error) {
-        //@ts-ignore
-        console.error('Erro ao buscar autocomplete:', error.message);
-      }
-    } else {
-      setAutocompleteOptions([]);
-    }
-  };
-
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
   };
 
+  const handleAutocompleteClick = async (patientId: number) => {
+    try {
+      const patient = await getPatientById(patientId); // Busca os dados do paciente pelo ID
+      if (patient) {
+        onViewPatient(patient.id); // Navega diretamente para a visualização do paciente
+      }
+    } catch (error) {
+      //@ts-ignore
+      console.error('Erro ao carregar paciente selecionado:', error.message);
+    }
+  };
+  
   return (
     <div className="">
       <h1 className="text-3xl font-bold mb-6">Pacientes</h1>
 
-      {/* Campo de pesquisa */}
+      {/* Campo de pesquisa e botão de adicionar em linha */}
       <div className="flex items-center space-x-4 mb-6">
         <div className="relative flex-1">
           <input
@@ -81,15 +105,15 @@ const Pacientes: React.FC<PacientesProps> = ({ onViewPatient, onHandleNewPacient
           {/* Autocomplete */}
           {autocompleteOptions.length > 0 && (
             <ul className="absolute bg-white border border-gray-300 w-full rounded-lg shadow-lg z-10">
-              {autocompleteOptions.map((option, index) => (
-                <li
-                  key={index}
-                  className="p-2 hover:bg-gray-200 cursor-pointer"
-                  onClick={() => handleSearch(option)}
-                >
-                  {option}
-                </li>
-              ))}
+             {autocompleteOptions.map((option: AutocompleteOption) => (
+              <li
+                key={option.id}
+                className="p-2 hover:bg-gray-200 cursor-pointer"
+                onClick={() => handleAutocompleteClick(option.id)}
+              >
+                {option.name}
+              </li>
+            ))}
             </ul>
           )}
         </div>

@@ -1,5 +1,10 @@
 import { supabase } from '../supabaseClient';
 
+interface AutocompleteOption {
+    id: number; // Identificador único do paciente
+    name: string; // Nome do paciente
+  }
+  
 export const addPatient = async (
     name: string,
     phone: string,
@@ -34,18 +39,18 @@ export const addPatient = async (
     return { data, total: count ?? 0 }; // Garante que `total` será sempre um número
   };
 
-  export const searchPatients = async (term: string) => {
+  export const searchPatients = async (term: string): Promise<AutocompleteOption[]> => {
     const { data, error } = await supabase
       .from('patients')
-      .select('name')
+      .select('id, name') // Certifique-se de selecionar apenas os campos necessários
       .ilike('name', `%${term}%`)
-      .limit(5); // Retorna até 5 opções de autocomplete
+      .limit(5);
   
     if (error) {
       throw error;
     }
   
-    return data.map((patient) => patient.name);
+    return data || [];
   };
 
   export const getPatientById = async (id: number) => {
