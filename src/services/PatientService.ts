@@ -1,4 +1,5 @@
 import { supabase } from '../supabaseClient';
+
 export const addPatient = async (
     name: string,
     phone: string,

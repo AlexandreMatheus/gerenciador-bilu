@@ -16,7 +16,7 @@ interface Patient {
   email: string;
 }
 
-const ITEMS_PER_PAGE = 20;
+const ITEMS_PER_PAGE = 18;
 
 const Pacientes: React.FC<PacientesProps> = ({ onViewPatient, onHandleNewPaciente }) => {
   const [patients, setPatients] = useState<Patient[]>([]);
@@ -65,64 +65,64 @@ const Pacientes: React.FC<PacientesProps> = ({ onViewPatient, onHandleNewPacient
   };
 
   return (
-    <div className="p-8">
+    <div className="">
       <h1 className="text-3xl font-bold mb-6">Pacientes</h1>
 
       {/* Campo de pesquisa */}
-      <div className="relative">
-        <input
-          type="text"
-          placeholder="Buscar paciente"
-          value={searchTerm}
-          onChange={(e) => handleSearch(e.target.value)}
-          className="w-full p-2 mb-6 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-        {/* Autocomplete */}
-        {autocompleteOptions.length > 0 && (
-          <ul className="absolute bg-white border border-gray-300 w-full rounded-lg shadow-lg z-10">
-            {autocompleteOptions.map((option, index) => (
-              <li
-                key={index}
-                className="p-2 hover:bg-gray-200 cursor-pointer"
-                onClick={() => handleSearch(option)}
-              >
-                {option}
-              </li>
-            ))}
-          </ul>
-        )}
+      <div className="flex items-center space-x-4 mb-6">
+        <div className="relative flex-1">
+          <input
+            type="text"
+            placeholder="Buscar paciente"
+            value={searchTerm}
+            onChange={(e) => handleSearch(e.target.value)}
+            className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          {/* Autocomplete */}
+          {autocompleteOptions.length > 0 && (
+            <ul className="absolute bg-white border border-gray-300 w-full rounded-lg shadow-lg z-10">
+              {autocompleteOptions.map((option, index) => (
+                <li
+                  key={index}
+                  className="p-2 hover:bg-gray-200 cursor-pointer"
+                  onClick={() => handleSearch(option)}
+                >
+                  {option}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+        <button
+          onClick={() => onHandleNewPaciente()}
+          className="p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+        >
+          Adicionar Paciente
+        </button>
       </div>
-
-      <button
-        onClick={() => onHandleNewPaciente()}
-        className="mb-6 p-2 bg-blue-500 text-white rounded"
-      >
-        Adicionar Paciente
-      </button>
-
-      {/* Lista de pacientes */}
-      {loading ? (
+    {/* Lista de pacientes como cards em grid */}
+    {loading ? (
         <p className="text-center">Carregando...</p>
       ) : (
-        <ul className="space-y-4">
+        <div className="grid grid-cols-1 sm:grid-cols-6 gap-6">
           {patients.map((patient) => (
-            <li
+            <div
               key={patient.id}
-              className="p-4 border border-gray-300 rounded-lg flex justify-between items-center"
+              className="p-4 border border-gray-300 rounded-lg shadow-md flex flex-col items-center"
             >
-              <div>
-                <p className="font-semibold">{patient.name}</p>
-                <p className="text-gray-600">Idade: {new Date().getFullYear() - new Date(patient.born_date).getFullYear()} anos</p>
+              <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+                <span className="text-xl font-bold text-blue-500">{patient.name.charAt(0)}</span>
               </div>
+              <p className="font-semibold text-lg text-center">{patient.name}</p>
               <button
                 onClick={() => onViewPatient(patient.id)}
-                className="text-blue-500 font-semibold hover:underline"
+                className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
               >
-                Ver Paciente
+                Ver
               </button>
-            </li>
+            </div>
           ))}
-        </ul>
+        </div>
       )}
 
       {/* Paginação */}

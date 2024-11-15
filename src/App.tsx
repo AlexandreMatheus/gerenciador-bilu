@@ -92,7 +92,7 @@ const App: React.FC = () => {
   return (
     <div className="flex">
       <Sidebar onSelectScreen={setSelectedScreen} onLogout={handleLogout}/>
-      <div className="ml-64 flex-grow p-8 bg-gray-100 min-h-screen">{renderContent()}</div>
+      <div className="ml-64 flex-grow p-2 bg-gray-100 min-h-screen">{renderContent()}</div>
     </div>
   );
 };
