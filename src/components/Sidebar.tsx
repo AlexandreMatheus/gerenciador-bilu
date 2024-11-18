@@ -14,7 +14,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onSelectScreen, onLogout  }) => {
 
   return (
     <div className="w-64 h-full bg-black text-white fixed top-0 left-0">
-      <h2 className="text-2xl font-bold text-center py-6">Meu App</h2>
+      <h2 className="text-2xl font-bold text-center py-6">BiluGeek</h2>
       <ul className="space-y-4 p-4">
         <li>
           <button
