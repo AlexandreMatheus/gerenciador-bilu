@@ -4,7 +4,7 @@ const useIsMobile = () => {
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    const mediaQuery = window.matchMedia('(max-width: 768px)'); // Define o limite para telas móveis
+    const mediaQuery = window.matchMedia('(max-width: 800px)'); // Define o limite para telas móveis
     setIsMobile(mediaQuery.matches);
 
     const handleResize = () => setIsMobile(mediaQuery.matches);
