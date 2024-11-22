@@ -3,10 +3,12 @@ import Sidebar from './components/Sidebar';
 import Estoque from './components/Estoque';
 import Login from './components/Login';
 import { supabase } from './supabaseClient';
+import useIsMobile from './hooks/useIsMobile';
 
 const App: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [selectedScreen, setSelectedScreen] = useState<string>('estoque');
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     const checkUser = async () => {
@@ -36,7 +38,7 @@ const App: React.FC = () => {
   return (
     <div className="flex">
       <Sidebar onSelectScreen={setSelectedScreen} onLogout={handleLogout}/>
-      <div className="ml-64 flex-grow p-2 bg-gray-100 min-h-screen">{renderContent()}</div>
+      <div className={`flex-grow p-2 bg-gray-100 min-h-screen ${!isMobile ? 'ml-64' : ''}`}>{renderContent()}</div>
     </div>
   );
 };

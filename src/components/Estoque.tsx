@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../supabaseClient';
+import { Card, CardContent, Typography, Box, Button, Grid, Input } from '@mui/joy';
 
 type Item = {
   id: number;
@@ -11,11 +12,6 @@ type Item = {
 
 const ITEMS_PER_PAGE = 10;
 
-interface AutocompleteOption {
-  id: number; // Identificador único do paciente
-  name: string; // Nome do paciente
-}
-
 const Estoque: React.FC = () => {
   const [items, setItems] = useState<Item[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -25,7 +21,6 @@ const Estoque: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // Função para buscar itens do estoque com paginação
   const fetchItems = async (page: number) => {
     setLoading(true);
     try {
@@ -41,7 +36,6 @@ const Estoque: React.FC = () => {
       const updatedItems = data.map((item) => {
         // Concatena o caminho do bucket de imagens com o nome do arquivo
         const imageUrl = `${supabase.storage.from('produtos').getPublicUrl(`Imagens/Estoque${item.imagem}`).data.publicUrl}`;
-        console.log(imageUrl);
         return { ...item, imagem: imageUrl };
       });
   
@@ -54,7 +48,6 @@ const Estoque: React.FC = () => {
     }
   };
 
-  // Atualiza a quantidade no banco
   const updateQuantity = async (itemId: number, quantity: number) => {
     try {
       const { error } = await supabase
@@ -107,7 +100,6 @@ const Estoque: React.FC = () => {
     searchItems(query);
   };
 
-  // Paginação
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
     fetchItems(page);
@@ -118,115 +110,116 @@ const Estoque: React.FC = () => {
   }, [currentPage]);
 
   return (
-    <div>
-      <h1 className="text-3xl font-bold mb-6">Estoque</h1>
+    <Box p={4}>
+      <Typography level="h1" fontSize="xl4" mb={2}>
+        Estoque
+      </Typography>
 
       {/* Campo de busca */}
-      <div className="relative mb-6">
-        <input
-          type="text"
-          value={searchTerm}
-          onChange={(e) => handleSearch(e.target.value)}
-          placeholder="Pesquisar no estoque..."
-          className="border rounded-lg px-4 py-2 w-full"
-        />
-        {/* Sugestões de autocomplete */}
-      </div>
+      <Input
+        value={searchTerm}
+        onChange={(e) => handleSearch(e.target.value)}
+        placeholder="Pesquisar no estoque..."
+        sx={{ mb: 4, width: '100%' }}
+      />
 
       {loading ? (
-        <p>Carregando...</p>
+        <Typography>Carregando...</Typography>
       ) : (
         <>
-          <div className="grid grid-cols-5 gap-4">
+          <Grid container spacing={2}>
             {items.map((item) => (
-              <div
-                key={item.id}
-                className="border rounded-lg shadow p-4 flex flex-col items-center"
-              >
+              <Grid key={item.id} xs={12} sm={6} md={4} lg={3}>
+                <Card variant="outlined" sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                  
                 <img
                   src={item.imagem}
                   alt={item.nome}
                   className="w-32 h-32 max-h-32 object-cover mb-4"
                 />
-                <h2 className="text-md font-semibold h-16 max-h-16">{item.nome}</h2>
-                <p className="text-gray-500">R$ {item.valor.toFixed(2)}</p>
-                <div className="w-full border border-black rounded-md p-2">
-                  {editingItemId === item.id ? (
-                    <div className="flex flex-col gap-2">
-                      <input
-                        type="number"
-                        value={newQuantity ?? item.quantidade}
-                        onChange={(e) =>
-                          setNewQuantity(parseInt(e.target.value, 10))
-                        }
-                        className="border rounded px-2 py-1 w-full text-center"
-                      />
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() =>
-                            newQuantity !== null &&
-                            updateQuantity(item.id, newQuantity)
-                          }
-                          className="bg-green-500 text-white px-3 py-1 rounded w-full"
-                        >
-                          Salvar
-                        </button>
-                        <button
+                <CardContent>
+                    <Typography color="neutral" sx={{height: '64px', maxHeight: '64px', color: 'black'}}>
+                      {item.nome}
+                    </Typography>
+                  </CardContent>
+                 <CardContent>
+                    <Typography color="neutral">
+                      R$ {item.valor.toFixed(2)}
+                    </Typography>
+                  </CardContent>
+                  <Box width="100%" px={2} mb={2}>
+                    {editingItemId === item.id ? (
+                      <Box display="flex" gap={1} flexDirection="column">
+                        <Input
+                          type="number"
+                          value={newQuantity ?? item.quantidade}
+                          onChange={(e) => setNewQuantity(parseInt(e.target.value, 10))}
+                          fullWidth
+                          size="md"
+                        />
+                        <Box display="flex" gap={1}>
+                          <Button
+                            onClick={() =>
+                              newQuantity !== null && updateQuantity(item.id, newQuantity)
+                            }
+                            color="success"
+                            fullWidth
+                          >
+                            Salvar
+                          </Button>
+                          <Button
+                            onClick={() => {
+                              setEditingItemId(null);
+                              setNewQuantity(null);
+                            }}
+                            color="danger"
+                            fullWidth
+                          >
+                            Cancelar
+                          </Button>
+                        </Box>
+                      </Box>
+                    ) : (
+                      <Box display="flex" flexDirection="column" gap={1}>
+                        <Input
+                          type="number"
+                          value={item.quantidade}
+                          disabled
+                          fullWidth
+                          size="sm"
+                        />
+                        <Button
                           onClick={() => {
-                            setEditingItemId(null);
-                            setNewQuantity(null);
+                            setEditingItemId(item.id);
+                            setNewQuantity(item.quantidade);
                           }}
-                          className="bg-red-500 text-white px-3 py-1 rounded w-full"
+                          fullWidth
                         >
-                          Cancelar
-                        </button>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="flex flex-col gap-2">
-                      <input
-                        type="number"
-                        value={item.quantidade}
-                        disabled
-                        className="border rounded px-2 py-1 w-full text-center"
-                      />
-                      <button
-                        onClick={() => {
-                          setEditingItemId(item.id);
-                          setNewQuantity(item.quantidade);
-                        }}
-                        className="bg-green-500 text-white px-3 py-1 rounded w-full"
-                      >
-                        Editar
-                      </button>
-                    </div>
-                  )}
-                </div>
-              </div>
+                          Editar
+                        </Button>
+                      </Box>
+                    )}
+                  </Box>
+                </Card>
+              </Grid>
             ))}
-          </div>
+          </Grid>
+
           {/* Paginação */}
-          <div className="flex justify-center mt-6 space-x-4">
-            {Array.from(
-              { length: Math.ceil(totalItems / ITEMS_PER_PAGE) },
-              (_, i) => (
-                <button
-                  key={i}
-                  className={`px-4 py-2 rounded ${
-                    currentPage === i + 1
-                      ? 'bg-blue-500 text-white'
-                      : 'bg-gray-200'
-                  }`}
-                  onClick={() => handlePageChange(i + 1)}
-                >
-                  {i + 1}
-                </button>
-              )
-            )}
-          </div>
+          <Box display="flex" justifyContent="center" mt={4}>
+            {Array.from({ length: Math.ceil(totalItems / ITEMS_PER_PAGE) }, (_, i) => (
+              <Button
+                key={i}
+                variant={currentPage === i + 1 ? 'soft' : 'plain'}
+                onClick={() => handlePageChange(i + 1)}
+              >
+                {i + 1}
+              </Button>
+            ))}
+          </Box>
         </>
       )}
-    </div>
+    </Box>
   );
 };
 
