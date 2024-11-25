@@ -26,6 +26,14 @@ const Sidebar: React.FC<SidebarProps> = ({ onSelectScreen, onLogout  }) => {
         </li>
         <li>
           <button
+            onClick={() => onSelectScreen('pedidos')}
+            className="w-full text-left px-4 py-2 rounded hover:bg-green-700"
+          >
+            Pedidos
+          </button>
+        </li>
+        <li>
+          <button
             onClick={handleLogout}
             className="w-full bg-green-500 hover:bg-green-600 py-2 rounded text-white font-semibold"
           >

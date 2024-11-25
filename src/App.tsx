@@ -3,6 +3,7 @@ import Sidebar from './components/Sidebar';
 import Estoque from './components/Estoque';
 import Login from './components/Login';
 import { supabase } from './supabaseClient';
+import Pedidos from './components/Pedidos';
 
 const App: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
@@ -28,6 +29,8 @@ const App: React.FC = () => {
     switch (selectedScreen) {
       case 'estoque':
         return <Estoque />;
+      case 'pedidos':
+        return <Pedidos />;
       default:
         return <Estoque />;
     }
