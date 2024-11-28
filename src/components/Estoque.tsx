@@ -10,7 +10,7 @@ type Item = {
   imagem: string;
 };
 
-const ITEMS_PER_PAGE = 10;
+const ITEMS_PER_PAGE = 8;
 
 const Estoque: React.FC = () => {
   const [items, setItems] = useState<Item[]>([]);
