@@ -68,6 +68,32 @@ const Sidebar: React.FC<SidebarProps> = ({ onSelectScreen, onLogout }) => {
             </li>
             <li>
               <Button
+                onClick={() => {
+                  onSelectScreen('pedidos');
+                  setDrawerOpen(false);
+                }}
+                
+                variant="plain"
+                sx={{ textAlign: 'left', width: '100%' }}
+              >
+                Pedidos
+              </Button>
+            </li>
+            <li>
+              <Button
+                onClick={() => {
+                  onSelectScreen('estampas');
+                  setDrawerOpen(false);
+                }}
+                
+                variant="plain"
+                sx={{ textAlign: 'left', width: '100%' }}
+              >
+                Estampas
+              </Button>
+            </li>
+            <li>
+              <Button
                 onClick={handleLogout}
                 variant="solid"
                 color="success"
@@ -133,6 +159,25 @@ const Sidebar: React.FC<SidebarProps> = ({ onSelectScreen, onLogout }) => {
               }}
             >
               Pedidos
+            </Button>
+          </li>
+          <li>
+            <Button
+              onClick={() => {
+                onSelectScreen('estampas');
+                setDrawerOpen(false);
+              }}
+              variant="plain"
+              sx={{
+                textAlign: 'left',
+                width: '100%',
+                color: 'white', // Cor branca no texto
+                '&:hover': {
+                  backgroundColor: 'green', // Fundo verde no hover
+                },
+              }}
+            >
+              Estampas
             </Button>
           </li>
           <li>
