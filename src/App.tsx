@@ -7,6 +7,7 @@ import ListaProdutoras from './components/ListaProdutoras';
 import ImagensProdutora from './components/ImagensProdutora';
 import { supabase } from './supabaseClient';
 import useIsMobile from './hooks/useIsMobile';
+import Dashboard from './components/Dashboard';
 
 const App: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
@@ -45,6 +46,8 @@ const App: React.FC = () => {
         return <Pedidos />;
       case 'estampas':
         return <ListaProdutoras onSelectProdutora={setSelectedProdutora} />;
+      case 'dashboard': // Adicionado
+        return <Dashboard />;
       default:
         return <Estoque />;
     }

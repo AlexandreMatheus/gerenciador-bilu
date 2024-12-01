@@ -147,7 +147,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onSelectScreen, onLogout }) => {
               onClick={() => {
                 onSelectScreen('pedidos');
                 setDrawerOpen(false);
-              }}
+              }}  
               variant="plain"
               sx={{
                 textAlign: 'left',
@@ -159,6 +159,25 @@ const Sidebar: React.FC<SidebarProps> = ({ onSelectScreen, onLogout }) => {
               }}
             >
               Pedidos
+            </Button>
+          </li>
+          <li>
+            <Button
+              onClick={() => {
+                onSelectScreen('dashboard');
+                setDrawerOpen(false);
+              }}  
+              variant="plain"
+              sx={{
+                textAlign: 'left',
+                width: '100%',
+                color: 'white', // Cor branca no texto
+                '&:hover': {
+                  backgroundColor: 'green', // Fundo verde no hover
+                },
+              }}
+            >
+              Dashboard
             </Button>
           </li>
           <li>
