@@ -8,6 +8,7 @@ import ImagensProdutora from './components/ImagensProdutora';
 import { supabase } from './supabaseClient';
 import useIsMobile from './hooks/useIsMobile';
 import Dashboard from './components/Dashboard';
+import { Box } from '@mui/joy';
 
 const App: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
@@ -56,12 +57,20 @@ const App: React.FC = () => {
   if (!isLoggedIn) return <Login onLogin={handleLogin} />;
 
   return (
-    <div className="flex">
-      <Sidebar onSelectScreen={setSelectedScreen} onLogout={handleLogout} />
-      <div className={`flex-grow p-2 bg-gray-100 min-h-screen ${!isMobile ? 'ml-64' : ''}`}>
-        {renderContent()}
-      </div>
-    </div>
+    <Box
+        sx={{
+          marginTop: { xs: '50px', sm: 0 }, // Adiciona espaço para Navbar em telas pequenas
+        }}
+      >
+        {/* Conteúdo principal */}
+        <Box>
+        <Sidebar onSelectScreen={setSelectedScreen} onLogout={handleLogout} />
+        <div className={`flex-grow p-2 bg-gray-100 min-h-screen ${!isMobile ? 'ml-64' : ''}`}>
+          {renderContent()}
+        </div>
+        </Box>
+      </Box>
+   
   );
 };
 
