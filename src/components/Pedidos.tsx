@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../supabaseClient';
+import { Button } from '@mui/joy';
 
 type Order = {
   id: number;
@@ -10,9 +11,13 @@ type Order = {
   created_at: string;
 };
 
-const ITEMS_PER_PAGE = 10;
+type OrdersProps = {
+  onSelectScreen: (screen: string) => void;
+}
 
-const Orders: React.FC = () => {
+const ITEMS_PER_PAGE = 20;
+
+const Orders: React.FC<OrdersProps> = ({onSelectScreen}) => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalOrders, setTotalOrders] = useState(0);
@@ -28,7 +33,7 @@ const Orders: React.FC = () => {
       const query = supabase
         .from('orders')
         .select('*', { count: 'exact' })
-        .order('created_at', { ascending: false })
+        .order('created_at', { ascending: true })
         .range((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE - 1);
 
       if (statusFilter) {
@@ -120,20 +125,37 @@ const Orders: React.FC = () => {
       <h1 className="text-3xl font-bold mb-6">Pedidos</h1>
 
       {/* Filtro de Status */}
-      <div className="mb-6">
+      <div className="mb-6 flex flex-row gap-3">
+        <div>
+          <label htmlFor="statusFilter" className="block text-sm font-medium mb-2">
+            Filtrar por Status:
+          </label>
+          <select
+            id="statusFilter"
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="border border-gray-300 rounded px-4 py-2"
+          >
+            <option value="">Todos</option>
+            <option value="pending">Pendente</option>
+            <option value="finalizado">Finalizado</option>
+          </select>
+        </div>
+        <div>
         <label htmlFor="statusFilter" className="block text-sm font-medium mb-2">
-          Filtrar por Status:
-        </label>
-        <select
-          id="statusFilter"
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-          className="border border-gray-300 rounded px-4 py-2"
-        >
-          <option value="">Todos</option>
-          <option value="pending">Pendente</option>
-          <option value="finalizado">Finalizado</option>
-        </select>
+            Novo Pedido:
+          </label>
+          <Button
+            onClick={() =>
+              onSelectScreen('criarPedido')
+            }
+            color="success"
+            
+          >
+            Criar
+          </Button>
+        </div>
+        
       </div>
 
       {loading ? (

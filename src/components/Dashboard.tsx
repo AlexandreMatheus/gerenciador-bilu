@@ -41,7 +41,7 @@ const StackedBarChart: React.FC = () => {
           month: 'short',
           year: 'numeric',
         });
-        const isFinalized = order.status === 'finalizado';
+        const isFinalized = order.status === 'Finalized';
 
         if (!groupedData[month]) {
           groupedData[month] = { finalizado: 0, pendente: 0 };
@@ -55,7 +55,6 @@ const StackedBarChart: React.FC = () => {
         finalized: groupedData[month].finalizado,
         pending: groupedData[month].pendente,
       }));
-      console.log(formattedData)
       setData(formattedData);
     };
 
