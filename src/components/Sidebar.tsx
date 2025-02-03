@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { supabase } from '../supabaseClient';
-import { Drawer, Button, Box, Typography } from '@mui/joy';
+import { Drawer, Button, Box, Typography, IconButton } from '@mui/joy';
 
 type SidebarProps = {
   onSelectScreen: (screen: string) => void;
@@ -9,35 +9,94 @@ type SidebarProps = {
 
 const Sidebar: React.FC<SidebarProps> = ({ onSelectScreen, onLogout }) => {
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [showScrollToTop, setShowScrollToTop] = useState(false);
 
   const handleLogout = async () => {
-    await supabase.auth.signOut(); // Desloga o usuário do Supabase
-    onLogout(); // Atualiza o estado de logout na aplicação principal
+    await supabase.auth.signOut();
+    onLogout();
   };
+
+  // Detecta o scroll para mostrar ou ocultar o botão "Voltar ao Topo"
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollToTop(window.scrollY > 200); // Mostra o botão ao rolar mais de 200px
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const menuItems = [
+    { label: 'Estoque', screen: 'estoque' },
+    { label: 'Pedidos', screen: 'pedidos' },
+    { label: 'Dashboard', screen: 'dashboard' },
+    { label: 'Estampas', screen: 'estampas' },
+  ];
+
+  const renderMenuItems = () =>
+    menuItems.map((item) => (
+      <li key={item.screen}>
+        <Button
+          onClick={() => {
+            onSelectScreen(item.screen);
+            setDrawerOpen(false);
+          }}
+          variant="plain"
+          sx={{
+            textAlign: 'left',
+            width: '100%',
+            color: 'white',
+            '&:hover': {
+              backgroundColor: 'green',
+            },
+          }}
+        >
+          {item.label}
+        </Button>
+      </li>
+    ));
 
   return (
     <>
-      {/* Botão para abrir o Drawer */}
-      <Button
-        onClick={() => setDrawerOpen(true)}
-        variant="solid"
-        color="primary"
+      {/* Navbar fixa para dispositivos menores */}
+      <Box
         sx={{
-          display: { xs: 'block', sm: 'none' }, // Mostra apenas em dispositivos móveis
+          display: { xs: 'flex', sm: 'none' },
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          bgcolor: 'black',
+          color: 'white',
+          px: 2,
+          py: 1,
           position: 'fixed',
-          top: '10px',
-          left: '10px',
+          width: '100%',
           zIndex: 1100,
+          top: 0,
         }}
       >
-        Menu
-      </Button>
+           <IconButton
+          onClick={() => setDrawerOpen(true)}
+          variant="plain"
+          sx={{ color: 'white' }}
+        >
+          <>Menu</>
+        </IconButton>
+        <Typography level="h2" fontSize="lg" sx={{ color: 'white' }}>
+          BiluGeek
+        </Typography>
+     
+      </Box>
 
-      {/* Drawer para dispositivos móveis */}
+      {/* Drawer para dispositivos menores */}
       <Drawer
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
-        sx={{ display: { xs: 'block', sm: 'none' } }} // Mostra apenas em dispositivos móveis
+        sx={{ display: { xs: 'block', sm: 'none' } }}
+        
       >
         <Box
           sx={{
@@ -47,170 +106,78 @@ const Sidebar: React.FC<SidebarProps> = ({ onSelectScreen, onLogout }) => {
             color: 'white',
             display: 'flex',
             flexDirection: 'column',
+            padding: 2,
+            justifyContent: 'space-between',
           }}
         >
-          <Typography level="h2" fontSize="lg" textAlign="center" py={2}>
-            BiluGeek
-          </Typography>
-          <ul className="space-y-4 p-4">
-            <li>
-              <Button
-                onClick={() => {
-                  onSelectScreen('estoque');
-                  setDrawerOpen(false);
-                }}
-                
-                variant="plain"
-                sx={{ textAlign: 'left', width: '100%' }}
-              >
-                Estoque
-              </Button>
-            </li>
-            <li>
-              <Button
-                onClick={() => {
-                  onSelectScreen('pedidos');
-                  setDrawerOpen(false);
-                }}
-                
-                variant="plain"
-                sx={{ textAlign: 'left', width: '100%' }}
-              >
-                Pedidos
-              </Button>
-            </li>
-            <li>
-              <Button
-                onClick={() => {
-                  onSelectScreen('estampas');
-                  setDrawerOpen(false);
-                }}
-                
-                variant="plain"
-                sx={{ textAlign: 'left', width: '100%' }}
-              >
-                Estampas
-              </Button>
-            </li>
-            <li>
-              <Button
-                onClick={handleLogout}
-                variant="solid"
-                color="success"
-                sx={{ textAlign: 'left', width: '100%' }}
-              >
-                Sair
-              </Button>
-            </li>
-          </ul>
+          <div>
+            <Typography level="h2" fontSize="lg" textAlign="center" py={2} sx={{ color: 'white' }}>
+              BiluGeek
+            </Typography>
+            <ul className="space-y-4 p-4">{renderMenuItems()}</ul>
+          </div>
+          <Button
+            onClick={handleLogout}
+            variant="solid"
+            color="success"
+            sx={{ textAlign: 'left', width: '100%' }}
+          >
+            Sair
+          </Button>
         </Box>
       </Drawer>
 
-      {/* Menu fixo para telas maiores */}
+      {/* Sidebar para dispositivos maiores */}
       <Box
         sx={{
           width: 250,
-          height: '100vh',
+          height: '100%',
           bgcolor: 'black',
           color: 'white',
-          display: { xs: 'none', sm: 'block' }, // Remove completamente o menu em telas menores
+          display: { xs: 'none', sm: 'flex' },
           position: 'fixed',
           top: 0,
           left: 0,
+          justifyContent: 'space-between',
+          flexDirection: 'column',
+          padding: 2
         }}
       >
-        <Typography level="h2" fontSize="lg" textAlign="center" sx={{color: 'white'}} py={2}>
+        <div>
+        <Typography level="h2" fontSize="lg" textAlign="center" sx={{ color: 'white' }} py={2}>
           BiluGeek
         </Typography>
-        <ul className="space-y-4 p-4">
-          <li>
-            <Button
-              onClick={() => {
-                onSelectScreen('estoque');
-                setDrawerOpen(false);
-              }}
-              variant="plain"
-              sx={{
-                textAlign: 'left',
-                width: '100%',
-                color: 'white', // Cor branca no texto
-                '&:hover': {
-                  backgroundColor: 'green', // Fundo verde no hover
-                },
-              }}
-            >
-              Estoque
-            </Button>
-          </li>
-          <li>
-            <Button
-              onClick={() => {
-                onSelectScreen('pedidos');
-                setDrawerOpen(false);
-              }}  
-              variant="plain"
-              sx={{
-                textAlign: 'left',
-                width: '100%',
-                color: 'white', // Cor branca no texto
-                '&:hover': {
-                  backgroundColor: 'green', // Fundo verde no hover
-                },
-              }}
-            >
-              Pedidos
-            </Button>
-          </li>
-          <li>
-            <Button
-              onClick={() => {
-                onSelectScreen('dashboard');
-                setDrawerOpen(false);
-              }}  
-              variant="plain"
-              sx={{
-                textAlign: 'left',
-                width: '100%',
-                color: 'white', // Cor branca no texto
-                '&:hover': {
-                  backgroundColor: 'green', // Fundo verde no hover
-                },
-              }}
-            >
-              Dashboard
-            </Button>
-          </li>
-          <li>
-            <Button
-              onClick={() => {
-                onSelectScreen('estampas');
-                setDrawerOpen(false);
-              }}
-              variant="plain"
-              sx={{
-                textAlign: 'left',
-                width: '100%',
-                color: 'white', // Cor branca no texto
-                '&:hover': {
-                  backgroundColor: 'green', // Fundo verde no hover
-                },
-              }}
-            >
-              Estampas
-            </Button>
-          </li>
-          <li>
-            <Button
-              onClick={handleLogout}
-              variant="solid"
-              color="success"
-              sx={{ textAlign: 'left', width: '100%' }}
-            >
-              Sair
-            </Button>
-          </li>
-        </ul>
+        <ul className="space-y-4 p-4">{renderMenuItems()}</ul>
+        </div>
+        <Button
+          onClick={handleLogout}
+          variant="solid"
+          color="success"
+          sx={{ textAlign: 'left', width: '100%' }}
+        >
+          Sair
+        </Button>
       </Box>
+
+      {/* Botão flutuante para voltar ao topo */}
+      {showScrollToTop && (
+        <IconButton
+          onClick={scrollToTop}
+          sx={{
+            position: 'fixed',
+            bottom: '20px',
+            right: '20px',
+            zIndex: 1200,
+            bgcolor: 'black',
+            color: 'white',
+            '&:hover': {
+              bgcolor: 'green',
+            },
+          }}
+        >
+          {'/\\'}
+        </IconButton>
+      )}
     </>
   );
 };
